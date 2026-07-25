@@ -1,0 +1,132 @@
+{
+  "nav": {
+    "howItWorks": "How it works",
+    "forNGOs": "For NGOs",
+    "impact": "Impact",
+    "signIn": "Sign in",
+    "getStarted": "Get started"
+  },
+  "hero": {
+    "title": "Surplus food rescued. Hunger reduced.",
+    "subtitle": "FoodBridge connects restaurants with NGOs",
+    "postFood": "Post surplus food",
+    "iAmNGO": "I'm an NGO",
+    "liveRescues": "food rescues happening now"
+  },
+  "listing": {
+    "claimNow": "Claim now",
+    "claimed": "Claimed",
+    "minutesLeft": "min left",
+    "portions": "portions available",
+    "postFood": "Post food",
+    "foodName": "Food name",
+    "quantity": "Quantity (portions)",
+    "location": "Pickup location",
+    "deadline": "Pickup deadline"
+  },
+  "dashboard": {
+    "donor": {
+      "title": "Post surplus food",
+      "subtitle": "Fill details — NGOs get alerted instantly",
+      "myListings": "Your recent listings"
+    },
+    "ngo": {
+      "title": "Live food near you",
+      "noFood": "No food listings near you right now",
+      "recentPickups": "Recent pickups"
+    }
+  },
+  "badges": {
+    "firstRescue": "First rescue",
+    "mealHero": "Meal hero",
+    "speedClaimer": "Speed claimer"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit"
+  },
+  "auth": {
+    "loginTitle": "Sign In to FoodBridge",
+    "loginSubtitle": "Enter your credentials to access your dashboard",
+    "registerTitle": "Join FoodBridge Network",
+    "registerSubtitle": "Register as a food Donor or NGO to eliminate waste",
+    "email": "Email Address",
+    "password": "Password",
+    "name": "Full Name / Organization Name",
+    "phone": "Phone Number",
+    "city": "City",
+    "role": "Select Role",
+    "loginButton": "Sign In",
+    "registerButton": "Create Account",
+    "noAccount": "Don't have an account? Sign Up",
+    "haveAccount": "Already have an account? Sign In",
+    "logout": "Sign Out",
+    "welcome": "Welcome",
+    "status": "Status"
+  },
+  "home": {
+    "activeListings": "Active Food Listings",
+    "activeSubtitle": "These food donations were recently posted by neighborhood businesses",
+    "viewMore": "Log In to View More Nearby Food",
+    "howTitle": "How It Works",
+    "howSubtitle": "A simple 3-step cycle to minimize neighborhood food waste",
+    "step1Title": "1. Post Surplus Food",
+    "step1Desc": "Hotels, bakeries, or event organizers post excess edible food with quantity and pickup time.",
+    "step2Title": "2. Instant Alerts",
+    "step2Desc": "Nearby registered NGOs get instant push and real-time WebSocket notifications.",
+    "step3Title": "3. Fast Rescue",
+    "step3Desc": "NGO claims the food, gets routing details, and distributes it to the needy.",
+    "footerTitle": "FoodBridge Network",
+    "footerDesc": "An open-source initiative leveraging real-time WebSockets and AI to eliminate urban food waste."
+  },
+  "donor": {
+    "foodType": "Food Type",
+    "condition": "Food Condition",
+    "pickupMinutes": "Pickup Time Window (Minutes)",
+    "aiEstimate": "✨ AI estimated — please verify",
+    "verifyAi": "Verify AI Estimate",
+    "actionCol": "Actions",
+    "qrModalTitle": "Food Package QR Code",
+    "qrModalSub": "Present this QR code to the NGO volunteer upon pickup for secure verification.",
+    "close": "Close"
+  },
+  "ngo": {
+    "portalTitle": "FoodBridge NGO Portal",
+    "nearbyAlerts": "Nearby Food Alerts (within 5km)",
+    "refreshFeed": "Refresh Feed",
+    "claimFood": "Claim Food",
+    "sosButton": "🚨 SOS",
+    "mapTitle": "Interactive Food Rescue Map",
+    "claimedByYou": "Claimed by You",
+    "enableNotif": "🔔 Enable notifications",
+    "notifEnabled": "🟢 Notifications enabled"
+  },
+  "admin": {
+    "portalTitle": "FoodBridge System Administration",
+    "totalUsers": "Total Registered Users",
+    "totalListings": "Total Food Listings",
+    "totalClaims": "Total Successful Claims",
+    "activeSOS": "Emergency SOS Alerts",
+    "pendingMod": "User Management & Moderation",
+    "approve": "Approve",
+    "block": "Block",
+    "refresh": "Refresh Metrics"
+  },
+  "impact": {
+    "certTitle": "Certificate of Environmental Impact",
+    "certSubtitle": "Awarded by FoodBridge Network in recognition of outstanding commitment to sustainability and food waste reduction.",
+    "co2Saved": "CO₂ Saved",
+    "treesEq": "Trees Planted Equivalent",
+    "waterSaved": "Water Saved",
+    "mealsRescued": "Meals Rescued",
+    "liveFeed": "Live Connection Active",
+    "chennaiDist": "Chennai Neighborhood Rescue Impact",
+    "chennaiSub": "Real-time tracking of food rescue volume across major city commercial zones",
+    "congrats": "Congratulations! Your dedication has directly reduced carbon emissions and supported urban food security.",
+    "awardedTo": "Awarded to",
+    "proudDonor": "Proud FoodBridge Partner"
+  }
+}
