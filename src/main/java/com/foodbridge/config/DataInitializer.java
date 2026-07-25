@@ -11,7 +11,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.logging.Logger;
 
+import org.springframework.context.annotation.Profile;
+
 @Component
+@Profile("local")
 public class DataInitializer implements CommandLineRunner {
 
     private static final Logger logger = Logger.getLogger(DataInitializer.class.getName());

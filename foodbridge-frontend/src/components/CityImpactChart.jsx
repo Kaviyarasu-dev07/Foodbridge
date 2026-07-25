@@ -42,7 +42,8 @@ const CityImpactChart = () => {
 
   const fetchCityBreakdown = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/public/impact/city');
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+      const response = await fetch(`${baseUrl}/api/public/impact/city`);
       if (response.ok) {
         const data = await response.json();
         
@@ -87,7 +88,7 @@ const CityImpactChart = () => {
 
   const connectWebSocket = () => {
     try {
-      const socket = new SockJS('http://localhost:8080/ws');
+      const socket = new SockJS('/ws');
       const client = new Client({
         webSocketFactory: () => socket,
         reconnectDelay: 5000,

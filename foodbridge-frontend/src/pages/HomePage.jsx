@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { Zap, Map, Brain, MapPin, Smartphone, ShieldCheck, Heart, Leaf, Utensils, Rocket } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle';
 import AnimatedCounter from '../components/AnimatedCounter';
 
@@ -82,42 +83,42 @@ const HomePage = () => {
       desc: "Instant WebSocket alerts connect surplus food donors with the nearest active NGOs the second food is posted.",
       tech: "STOMP WebSockets",
       color: "blue",
-      icon: "⚡"
+      icon: <Zap size={24} />
     },
     {
       title: "AI Route Optimizer",
       desc: "Calculates the absolute fastest multi-stop collection paths for volunteer drivers using advanced geographic nearest-neighbour matrices.",
       tech: "Route Optimizer",
       color: "green",
-      icon: "🗺️"
+      icon: <Map size={24} />
     },
     {
       title: "Predictive Surplus Alerts",
       desc: "Advanced algorithmic patterns analyze recurring donor behaviors to alert NGOs of incoming surplus food before it is even officially listed.",
       tech: "AI Estimator",
       color: "purple",
-      icon: "🔮"
+      icon: <Brain size={24} />
     },
     {
       title: "Interactive Geolocation",
       desc: "Pinpoints exact rescue locations, donor kitchens, and hunger spots across the city with dynamic mapping integrations.",
       tech: "Leaflet Maps",
       color: "amber",
-      icon: "📍"
+      icon: <MapPin size={24} />
     },
     {
       title: "Progressive Web App",
       desc: "Install directly to your home screen for ultra-fast native access, background syncing, and real-time push notification updates.",
       tech: "Vite PWA",
       color: "rose",
-      icon: "📱"
+      icon: <Smartphone size={24} />
     },
     {
       title: "Robust Secure Backend",
       desc: "Engineered for high concurrency, rock-solid transactional safety, and comprehensive audit logging for complete transparency.",
       tech: "Spring Boot",
       color: "teal",
-      icon: "🛡️"
+      icon: <ShieldCheck size={24} />
     }
   ];
 
@@ -155,15 +156,15 @@ const HomePage = () => {
         </div>
         <div className="clean-trust-row">
           <div className="clean-trust-item">
-            <span className="clean-trust-icon">🛡️</span>
+            <span className="clean-trust-icon"><ShieldCheck size={20} /></span>
             <span>FSSAI Safety Verified</span>
           </div>
           <div className="clean-trust-item">
-            <span className="clean-trust-icon">💚</span>
+            <span className="clean-trust-icon"><Heart size={20} /></span>
             <span>100% Volunteer Network</span>
           </div>
           <div className="clean-trust-item">
-            <span className="clean-trust-icon">🌿</span>
+            <span className="clean-trust-icon"><Leaf size={20} /></span>
             <span>Zero Waste Mission</span>
           </div>
         </div>
@@ -242,7 +243,7 @@ const HomePage = () => {
         <div className="clean-how-grid">
           <div className="clean-how-step">
             <div className="clean-step-num">1</div>
-            <div className="clean-step-icon-box">🥘</div>
+            <div className="clean-step-icon-box"><Utensils size={32} /></div>
             <h4 className="clean-step-title">Donor Posts Surplus</h4>
             <p className="clean-step-desc">
               Restaurants or event hosts list excess fresh food in 30 seconds. Our platform automatically tags geolocation and sets rigorous safety expiration timers.
@@ -250,7 +251,7 @@ const HomePage = () => {
           </div>
           <div className="clean-how-step">
             <div className="clean-step-num">2</div>
-            <div className="clean-step-icon-box">⚡</div>
+            <div className="clean-step-icon-box"><Zap size={32} /></div>
             <h4 className="clean-step-title">Instant NGO Alert</h4>
             <p className="clean-step-desc">
               Nearby verified NGOs receive instant WebSocket notifications. Volunteers review portion details, dietary categories, and claim the food instantly.
@@ -258,7 +259,7 @@ const HomePage = () => {
           </div>
           <div className="clean-how-step">
             <div className="clean-step-num">3</div>
-            <div className="clean-step-icon-box">🚀</div>
+            <div className="clean-step-icon-box"><Rocket size={32} /></div>
             <h4 className="clean-step-title">Optimized Pickup</h4>
             <p className="clean-step-desc">
               Our integrated AI Route Optimizer coordinates the absolute fastest collection path. The food reaches hungry citizens in under 60 minutes.
