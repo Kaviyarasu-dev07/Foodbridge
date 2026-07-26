@@ -11,12 +11,13 @@ public class LiveImpactDTO {
     private int activeDonors;
     private int activeNGOs;
     private LocalDateTime lastUpdated;
+    private double co2EquivalentOffsetKg;
 
     public LiveImpactDTO() {
     }
 
     public LiveImpactDTO(long totalMealsRescued, double totalCO2SavedKg, double treesEquivalent, long waterSavedLitres,
-                          int todayMeals, int activeDonors, int activeNGOs, LocalDateTime lastUpdated) {
+                          int todayMeals, int activeDonors, int activeNGOs, LocalDateTime lastUpdated, double co2EquivalentOffsetKg) {
         this.totalMealsRescued = totalMealsRescued;
         this.totalCO2SavedKg = totalCO2SavedKg;
         this.treesEquivalent = treesEquivalent;
@@ -25,6 +26,7 @@ public class LiveImpactDTO {
         this.activeDonors = activeDonors;
         this.activeNGOs = activeNGOs;
         this.lastUpdated = lastUpdated;
+        this.co2EquivalentOffsetKg = co2EquivalentOffsetKg;
     }
 
     public long getTotalMealsRescued() { return totalMealsRescued; }
@@ -51,6 +53,9 @@ public class LiveImpactDTO {
     public LocalDateTime getLastUpdated() { return lastUpdated; }
     public void setLastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; }
 
+    public double getCo2EquivalentOffsetKg() { return co2EquivalentOffsetKg; }
+    public void setCo2EquivalentOffsetKg(double co2EquivalentOffsetKg) { this.co2EquivalentOffsetKg = co2EquivalentOffsetKg; }
+
     public static LiveImpactDTOBuilder builder() {
         return new LiveImpactDTOBuilder();
     }
@@ -64,6 +69,7 @@ public class LiveImpactDTO {
         private int activeDonors;
         private int activeNGOs;
         private LocalDateTime lastUpdated;
+        private double co2EquivalentOffsetKg;
 
         LiveImpactDTOBuilder() {}
 
@@ -75,9 +81,10 @@ public class LiveImpactDTO {
         public LiveImpactDTOBuilder activeDonors(int activeDonors) { this.activeDonors = activeDonors; return this; }
         public LiveImpactDTOBuilder activeNGOs(int activeNGOs) { this.activeNGOs = activeNGOs; return this; }
         public LiveImpactDTOBuilder lastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; return this; }
+        public LiveImpactDTOBuilder co2EquivalentOffsetKg(double co2EquivalentOffsetKg) { this.co2EquivalentOffsetKg = co2EquivalentOffsetKg; return this; }
 
         public LiveImpactDTO build() {
-            return new LiveImpactDTO(totalMealsRescued, totalCO2SavedKg, treesEquivalent, waterSavedLitres, todayMeals, activeDonors, activeNGOs, lastUpdated);
+            return new LiveImpactDTO(totalMealsRescued, totalCO2SavedKg, treesEquivalent, waterSavedLitres, todayMeals, activeDonors, activeNGOs, lastUpdated, co2EquivalentOffsetKg);
         }
     }
 }

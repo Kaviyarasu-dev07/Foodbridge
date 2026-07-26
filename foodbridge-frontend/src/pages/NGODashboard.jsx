@@ -42,6 +42,10 @@ const NGODashboard = () => {
   const [activeChatListing, setActiveChatListing] = useState(null);
   const [unreadCounts, setUnreadCounts] = useState({});
   const [selectedListingIds, setSelectedListingIds] = useState([]);
+  const [averageRating, setAverageRating] = useState(null);
+  const [ratingListing, setRatingListing] = useState(null);
+  const [ratingScore, setRatingScore] = useState(5);
+  const [ratingComment, setRatingComment] = useState('');
   const [optimizedRoute, setOptimizedRoute] = useState(null);
   const [routeLoading, setRouteLoading] = useState(false);
   const [predictiveAlerts, setPredictiveAlerts] = useState([]);
@@ -153,6 +157,13 @@ const NGODashboard = () => {
       const response = await api.get('/api/auth/me');
       setProfile(response.data);
       
+      try {
+        const ratingRes = await api.get(`/api/ratings/user/${response.data.id}/average`);
+        setAverageRating(ratingRes.data);
+      } catch (e) {
+        console.error("Failed to fetch average rating", e);
+      }
+
       // Fetch nearby listings using profile coordinates
       fetchNearby(response.data.latitude || 13.0827, response.data.longitude || 80.2707);
 
@@ -286,6 +297,23 @@ const NGODashboard = () => {
     }
   };
 
+  const handleRatingSubmit = async () => {
+    if (ratingScore < 1 || ratingScore > 5) return;
+    try {
+      await api.post('/api/ratings', {
+        listingId: ratingListing.id,
+        score: ratingScore,
+        comment: ratingComment
+      });
+      toast.success('Rating submitted successfully!');
+      setRatingListing(null);
+      setRatingScore(5);
+      setRatingComment('');
+    } catch (err) {
+      toast.error(err.response?.data || 'Failed to submit rating');
+    }
+  };
+
   const handleLogout = () => {
     localStorage.clear();
     toast.success("Logged out successfully");
@@ -305,6 +333,7 @@ const NGODashboard = () => {
             <span className={`status-badge status-${profile?.status.toLowerCase()}`}>
               {profile?.status}
             </span>
+            {averageRating !== null && averageRating > 0 && <span className="badge" style={{marginLeft: '10px', background: '#fef3c7', color: '#b45309', padding: '4px 8px', borderRadius: '12px', fontSize: '0.8rem'}}>⭐ {averageRating.toFixed(1)}</span>}
           </p>
         </div>
         <div className="header-actions">
@@ -446,16 +475,25 @@ const NGODashboard = () => {
                         </button>
                       </>
                     ) : (
-                      <div className="claimed-status-overlay" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                        <span>✅ {t('ngo.claimedByYou', 'Claimed by You')}</span>
-                        <button
-                          onClick={() => setActiveChatListing(item)}
-                          className="btn btn-primary btn-small chat-btn"
+                      <div className="claimed-status-overlay" style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span>✅ {t('ngo.claimedByYou', 'Claimed by You')}</span>
+                          <button
+                            onClick={() => setActiveChatListing(item)}
+                            className="btn btn-primary btn-small chat-btn"
+                          >
+                            💬 Chat
+                            {unreadCounts[item.id] > 0 && (
+                              <span className="unread-badge">{unreadCounts[item.id]}</span>
+                            )}
+                          </button>
+                        </div>
+                        <button 
+                          onClick={() => setRatingListing(item)}
+                          className="btn btn-secondary btn-small"
+                          style={{ background: '#fef3c7', color: '#b45309', borderColor: '#fef3c7', width: '100%' }}
                         >
-                          💬 Chat
-                          {unreadCounts[item.id] > 0 && (
-                            <span className="unread-badge">{unreadCounts[item.id]}</span>
-                          )}
+                          ⭐ Rate Donor
                         </button>
                       </div>
                     )}
@@ -514,6 +552,43 @@ const NGODashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Rating Modal */}
+      {ratingListing && (
+        <div className="modal-overlay" onClick={() => setRatingListing(null)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3>Rate the Donor</h3>
+            <p>How was your experience for <strong>{ratingListing.foodName}</strong>?</p>
+            
+            <div className="form-group" style={{ marginTop: '20px' }}>
+              <label>Score (1-5)</label>
+              <select value={ratingScore} onChange={(e) => setRatingScore(parseInt(e.target.value))}>
+                <option value={5}>⭐⭐⭐⭐⭐ (5 - Excellent)</option>
+                <option value={4}>⭐⭐⭐⭐ (4 - Good)</option>
+                <option value={3}>⭐⭐⭐ (3 - Average)</option>
+                <option value={2}>⭐⭐ (2 - Poor)</option>
+                <option value={1}>⭐ (1 - Terrible)</option>
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label>Comment (Optional)</label>
+              <textarea 
+                value={ratingComment} 
+                onChange={(e) => setRatingComment(e.target.value)}
+                placeholder="Share your experience..."
+                rows="3"
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--gray-light)' }}
+              />
+            </div>
+            
+            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+              <button onClick={handleRatingSubmit} className="btn btn-primary" style={{ flex: '1' }}>Submit Rating</button>
+              <button onClick={() => setRatingListing(null)} className="btn btn-secondary" style={{ flex: '1' }}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Rescue Chat Modal */}
       {activeChatListing && (

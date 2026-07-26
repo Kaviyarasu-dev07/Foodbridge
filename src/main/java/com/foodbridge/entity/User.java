@@ -38,6 +38,12 @@ public class User {
     @Column(nullable = false, columnDefinition = "double default 5.0")
     private Double trustScore = 5.0;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "varchar(255) default 'PENDING'")
+    private VerificationStatus verificationStatus = VerificationStatus.PENDING;
+
+    private String verificationDocumentUrl;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -46,7 +52,8 @@ public class User {
     }
 
     public User(Long id, String name, String email, String passwordHash, Role role, String phone, String city,
-                Double latitude, Double longitude, UserStatus status, Double trustScore, LocalDateTime createdAt) {
+                Double latitude, Double longitude, UserStatus status, Double trustScore, LocalDateTime createdAt,
+                VerificationStatus verificationStatus, String verificationDocumentUrl) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -59,6 +66,8 @@ public class User {
         this.status = status;
         this.trustScore = trustScore;
         this.createdAt = createdAt;
+        this.verificationStatus = verificationStatus != null ? verificationStatus : VerificationStatus.PENDING;
+        this.verificationDocumentUrl = verificationDocumentUrl;
     }
 
     public Long getId() { return id; }
@@ -85,6 +94,10 @@ public class User {
     public void setTrustScore(Double trustScore) { this.trustScore = trustScore; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public VerificationStatus getVerificationStatus() { return verificationStatus; }
+    public void setVerificationStatus(VerificationStatus verificationStatus) { this.verificationStatus = verificationStatus; }
+    public String getVerificationDocumentUrl() { return verificationDocumentUrl; }
+    public void setVerificationDocumentUrl(String verificationDocumentUrl) { this.verificationDocumentUrl = verificationDocumentUrl; }
 
     public static UserBuilder builder() {
         return new UserBuilder();
@@ -103,6 +116,8 @@ public class User {
         private UserStatus status;
         private Double trustScore = 5.0;
         private LocalDateTime createdAt;
+        private VerificationStatus verificationStatus = VerificationStatus.PENDING;
+        private String verificationDocumentUrl;
 
         UserBuilder() {}
 
@@ -118,14 +133,16 @@ public class User {
         public UserBuilder status(UserStatus status) { this.status = status; return this; }
         public UserBuilder trustScore(Double trustScore) { this.trustScore = trustScore; return this; }
         public UserBuilder createdAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
+        public UserBuilder verificationStatus(VerificationStatus verificationStatus) { this.verificationStatus = verificationStatus; return this; }
+        public UserBuilder verificationDocumentUrl(String verificationDocumentUrl) { this.verificationDocumentUrl = verificationDocumentUrl; return this; }
 
         public User build() {
-            return new User(id, name, email, passwordHash, role, phone, city, latitude, longitude, status, trustScore, createdAt);
+            return new User(id, name, email, passwordHash, role, phone, city, latitude, longitude, status, trustScore, createdAt, verificationStatus, verificationDocumentUrl);
         }
     }
 
     public enum Role {
-        DONOR, NGO, ADMIN
+        DONOR, NGO, ADMIN, VOLUNTEER
     }
 
     public enum UserStatus {

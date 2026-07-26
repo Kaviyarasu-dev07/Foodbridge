@@ -4,6 +4,27 @@ import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 import ThemeToggle from '../components/ThemeToggle';
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const AdminDashboard = () => {
   const { t } = useTranslation();
@@ -16,15 +37,31 @@ const AdminDashboard = () => {
   });
   const [users, setUsers] = useState([]);
   const [listings, setListings] = useState([]);
+  const [analytics, setAnalytics] = useState(null);
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [loadingListings, setLoadingListings] = useState(true);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchStats();
     fetchUsers();
     fetchListings();
+    fetchAnalytics();
   }, []);
+
+  const fetchAnalytics = async () => {
+    setLoadingAnalytics(true);
+    try {
+      const response = await api.get('/api/admin/analytics');
+      setAnalytics(response.data);
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to load analytics');
+    } finally {
+      setLoadingAnalytics(false);
+    }
+  };
 
   const fetchStats = async () => {
     try {
@@ -69,6 +106,17 @@ const AdminDashboard = () => {
       
       // Refresh stats
       fetchStats();
+    } catch (err) {
+      console.error(err);
+      toast.error(t('common.error'));
+    }
+  };
+
+  const handleVerificationChange = async (userId, newStatus) => {
+    try {
+      await api.put(`/api/admin/users/${userId}/verify?status=${newStatus}`);
+      toast.success(`Verification status updated to ${newStatus}`);
+      setUsers(prev => prev.map(u => u.id === userId ? { ...u, verificationStatus: newStatus } : u));
     } catch (err) {
       console.error(err);
       toast.error(t('common.error'));
@@ -136,6 +184,7 @@ const AdminDashboard = () => {
                     <th>{t('auth.role')}</th>
                     <th>{t('auth.city')}</th>
                     <th>{t('auth.status')}</th>
+                    <th>Verification</th>
                     <th>{t('admin.actions', 'Actions')}</th>
                   </tr>
                 </thead>
@@ -152,7 +201,24 @@ const AdminDashboard = () => {
                         </span>
                       </td>
                       <td>
-                        <div className="action-buttons-cell">
+                        {u.role === 'DONOR' ? (
+                          <div style={{display: 'flex', flexDirection: 'column', gap: '4px'}}>
+                            <span className={`status-badge`} style={{
+                              background: u.verificationStatus === 'VERIFIED' ? '#dcfce7' : u.verificationStatus === 'REJECTED' ? '#fee2e2' : '#fef9c3',
+                              color: u.verificationStatus === 'VERIFIED' ? '#166534' : u.verificationStatus === 'REJECTED' ? '#991b1b' : '#854d0e',
+                              fontSize: '0.75rem',
+                              padding: '2px 8px'
+                            }}>
+                              {u.verificationStatus || 'PENDING'}
+                            </span>
+                            {u.verificationDocumentUrl && (
+                              <a href={u.verificationDocumentUrl} target="_blank" rel="noopener noreferrer" style={{fontSize: '0.75rem', color: 'var(--primary)'}}>View Doc</a>
+                            )}
+                          </div>
+                        ) : '-'}
+                      </td>
+                      <td>
+                        <div className="action-buttons-cell" style={{flexWrap: 'wrap', gap: '8px', minWidth: '150px'}}>
                           {u.status !== 'ACTIVE' && (
                             <button
                               onClick={() => handleStatusChange(u.id, 'ACTIVE')}
@@ -168,6 +234,12 @@ const AdminDashboard = () => {
                             >
                               {t('admin.block', 'Block')}
                             </button>
+                          )}
+                          {u.role === 'DONOR' && u.verificationStatus === 'PENDING' && u.verificationDocumentUrl && (
+                            <>
+                              <button onClick={() => handleVerificationChange(u.id, 'VERIFIED')} className="btn btn-primary btn-small" style={{background: '#166534', borderColor: '#166534'}}>Verify</button>
+                              <button onClick={() => handleVerificationChange(u.id, 'REJECTED')} className="btn btn-danger btn-small">Reject Doc</button>
+                            </>
                           )}
                         </div>
                       </td>
@@ -220,6 +292,69 @@ const AdminDashboard = () => {
             </div>
           )}
         </div>
+
+        {/* Platform Analytics Section */}
+        <div className="dashboard-card form-card" style={{ marginTop: '30px' }}>
+          <div className="panel-header">
+            <h3>Platform Analytics</h3>
+            <button onClick={fetchAnalytics} className="btn btn-secondary btn-small">Reload</button>
+          </div>
+
+          {loadingAnalytics ? (
+            <p className="no-data">{t('common.loading', 'Loading...')}</p>
+          ) : !analytics ? (
+            <p className="no-data">Failed to load analytics data.</p>
+          ) : (
+            <div style={{ padding: '20px 0' }}>
+              <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap', marginBottom: '30px' }}>
+                <div className="impact-box" style={{ flex: '1', minWidth: '200px', display: 'flex', alignItems: 'center', gap: '15px', padding: '20px', background: 'var(--surface-color)', borderRadius: '12px', border: '1px solid var(--gray-light)' }}>
+                  <span className="box-icon" style={{ fontSize: '2rem' }}>📈</span>
+                  <div className="box-details">
+                    <h3 style={{ margin: 0, fontSize: '1.8rem', color: 'var(--primary)' }}>{analytics.claimRatePercentage.toFixed(1)}%</h3>
+                    <p style={{ margin: '5px 0 0', color: 'var(--gray-dark)' }}>Global Claim Rate</p>
+                  </div>
+                </div>
+                <div className="impact-box" style={{ flex: '1', minWidth: '200px', display: 'flex', alignItems: 'center', gap: '15px', padding: '20px', background: 'var(--surface-color)', borderRadius: '12px', border: '1px solid var(--gray-light)' }}>
+                  <span className="box-icon" style={{ fontSize: '2rem' }}>⏱️</span>
+                  <div className="box-details">
+                    <h3 style={{ margin: 0, fontSize: '1.8rem', color: 'var(--primary)' }}>{analytics.averageTimeToClaimMinutes.toFixed(0)} min</h3>
+                    <p style={{ margin: '5px 0 0', color: 'var(--gray-dark)' }}>Average Time-to-Claim</p>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ height: '350px', width: '100%' }}>
+                <Line
+                  data={{
+                    labels: Object.keys(analytics.listingsPerDay),
+                    datasets: [
+                      {
+                        label: 'Listings Created',
+                        data: Object.values(analytics.listingsPerDay),
+                        borderColor: 'rgb(29, 158, 117)',
+                        backgroundColor: 'rgba(29, 158, 117, 0.5)',
+                        tension: 0.3,
+                        fill: true
+                      }
+                    ]
+                  }}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                      legend: { position: 'top' },
+                      title: { display: true, text: 'Listings Created (Last 30 Days)' }
+                    },
+                    scales: {
+                      y: { beginAtZero: true, ticks: { stepSize: 1 } }
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
       </div>
     </div>
   );

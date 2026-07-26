@@ -71,7 +71,7 @@ public class SecurityConfig {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         var authorize = http.authorizeRequests()
-            .antMatchers("/api/auth/register", "/api/auth/login", "/ws/**", "/api/public/**").permitAll();
+            .antMatchers("/api/auth/register", "/api/auth/login", "/api/auth/*/upload-verification", "/uploads/**", "/ws/**", "/api/public/**").permitAll();
 
         if (isLocal) {
             authorize = authorize.antMatchers("/h2-console/**").permitAll();
@@ -81,6 +81,7 @@ public class SecurityConfig {
             .antMatchers("/api/donor/**").hasRole("DONOR")
             .antMatchers("/api/ngo/**").hasRole("NGO")
             .antMatchers("/api/admin/**").hasRole("ADMIN")
+            .antMatchers("/api/volunteer/**").hasRole("VOLUNTEER")
             .anyRequest().authenticated();
 
         if (isLocal) {

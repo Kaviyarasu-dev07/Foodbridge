@@ -7,6 +7,7 @@ const LiveImpactCounter = () => {
   const [impactData, setImpactData] = useState({
     totalMealsRescued: 0,
     totalCO2SavedKg: 0.0,
+    co2EquivalentOffsetKg: 0.0,
     treesEquivalent: 0.0,
     waterSavedLitres: 0,
     todayMeals: 0,
@@ -125,9 +126,12 @@ const LiveImpactCounter = () => {
           <span className="box-icon">🌱</span>
           <div className="box-details">
             <h3>
-              <AnimatedCounter value={impactData.totalCO2SavedKg} suffix=" kg" />
+              <AnimatedCounter value={impactData.co2EquivalentOffsetKg || impactData.totalCO2SavedKg} suffix=" kg" />
             </h3>
-            <p>CO₂ Emissions Prevented</p>
+            <p>
+              CO₂ Emissions Prevented
+              <span title="Based on ~2.5kg CO2e per kg of food waste diverted, EPA estimate" style={{ cursor: 'help', marginLeft: '5px', fontSize: '0.9em' }}>ℹ️</span>
+            </p>
           </div>
         </div>
 

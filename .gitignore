@@ -18,3 +18,5 @@ vapid.json
 
 src/main/resources/application.properties
 src/main/resources/application-local.properties
+
+backend-log.txt

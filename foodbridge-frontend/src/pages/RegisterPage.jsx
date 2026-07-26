@@ -15,6 +15,7 @@ const RegisterPage = () => {
   const [city, setCity] = useState('');
   const [latitude, setLatitude] = useState(13.0827);
   const [longitude, setLongitude] = useState(80.2707);
+  const [verificationFile, setVerificationFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -52,6 +53,20 @@ const RegisterPage = () => {
         longitude
       };
       const response = await api.post('/api/auth/register', payload);
+      
+      if (role === 'DONOR' && verificationFile) {
+        try {
+          const formData = new FormData();
+          formData.append('document', verificationFile);
+          await api.post(`/api/auth/${response.data.userId}/upload-verification`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+        } catch (uploadErr) {
+          console.error("Failed to upload verification document:", uploadErr);
+          toast.error("Account created, but document upload failed. Try again from dashboard later.");
+        }
+      }
+
       toast.success(response.data.message || "Registration successful! You can now log in.");
       navigate('/login');
     } catch (err) {
@@ -103,6 +118,7 @@ const RegisterPage = () => {
                 <select id="role" value={role} onChange={(e) => setRole(e.target.value)}>
                   <option value="DONOR">DONOR (Restaurant, Store, Individual)</option>
                   <option value="NGO">NGO (Charity, Food Bank)</option>
+                  <option value="VOLUNTEER">VOLUNTEER (Delivery Driver)</option>
                 </select>
               </div>
             </div>
@@ -155,6 +171,20 @@ const RegisterPage = () => {
                 />
               </div>
             </div>
+
+            {role === 'DONOR' && (
+              <div className="form-group" style={{ marginTop: '15px' }}>
+                <label htmlFor="verificationDoc">Verification Document (FSSAI/ID - Optional)</label>
+                <input
+                  type="file"
+                  id="verificationDoc"
+                  accept="image/jpeg, image/png, application/pdf"
+                  onChange={(e) => setVerificationFile(e.target.files[0])}
+                  style={{ padding: '8px 0' }}
+                />
+                <span className="info-subtext" style={{ fontSize: '0.8rem', color: '#666' }}>Optional. Max 5MB. Can be uploaded later in dashboard.</span>
+              </div>
+            )}
 
             <div className="form-coords-info">
               <p><strong>Detected Location:</strong> Lat: {latitude.toFixed(4)}, Lng: {longitude.toFixed(4)}</p>

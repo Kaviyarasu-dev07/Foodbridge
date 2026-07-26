@@ -39,6 +39,8 @@ const LoginPage = () => {
         navigate('/ngo/dashboard', { replace: true });
       } else if (cleanRole === 'ADMIN') {
         navigate('/admin/dashboard', { replace: true });
+      } else if (cleanRole === 'VOLUNTEER') {
+        navigate('/volunteer/dashboard', { replace: true });
       } else {
         navigate('/', { replace: true });
       }

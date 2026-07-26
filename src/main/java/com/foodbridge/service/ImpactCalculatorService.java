@@ -29,6 +29,14 @@ public class ImpactCalculatorService {
     @Autowired
     private ClaimRepository claimRepository;
 
+    // Based on EPA/published estimates: approximately 2.5 kg CO2-equivalent 
+    // prevented per kg of food waste diverted from landfill.
+    private static final double CO2_EQUIVALENT_PER_KG_FOOD = 2.5;
+
+    public double calculateCO2EquivalentPrevented(double kgOfFoodRescued) {
+        return kgOfFoodRescued * CO2_EQUIVALENT_PER_KG_FOOD;
+    }
+
     public double calculateCO2Saved(int mealsRescued) {
         return mealsRescued * 0.5;
     }
@@ -53,6 +61,10 @@ public class ImpactCalculatorService {
         double totalTrees = calculateTreesEquivalent(totalCO2);
         long totalWater = calculateWaterSaved((int) totalMeals);
 
+        // Assume 1 meal = 0.5kg of food for the offset calculation
+        double kgOfFoodRescued = totalMeals * 0.5;
+        double co2EquivalentOffsetKg = calculateCO2EquivalentPrevented(kgOfFoodRescued);
+
         int todayMealsCount = getTodayMealsCount();
         int donorsCount = getActiveDonorsCount();
         int ngosCount = getActiveNGOsCount();
@@ -66,6 +78,7 @@ public class ImpactCalculatorService {
                 .activeDonors(donorsCount)
                 .activeNGOs(ngosCount)
                 .lastUpdated(LocalDateTime.now())
+                .co2EquivalentOffsetKg(co2EquivalentOffsetKg)
                 .build();
     }
 

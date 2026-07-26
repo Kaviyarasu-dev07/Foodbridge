@@ -10,6 +10,7 @@ const HomePage = () => {
   const [impactData, setImpactData] = useState({
     totalMealsRescued: 15420,
     totalCO2SavedKg: 5820.5,
+    co2EquivalentOffsetKg: 19275.0,
     treesEquivalent: 240,
     waterSavedLitres: 45000,
     todayMeals: 342,
@@ -183,9 +184,12 @@ const HomePage = () => {
           <div className="clean-impact-cell">
             <div className="clean-impact-label">🌱 Carbon Offset</div>
             <div className="clean-impact-num">
-              <AnimatedCounter value={impactData.totalCO2SavedKg} duration={1500} suffix=" kg" />
+              <AnimatedCounter value={impactData.co2EquivalentOffsetKg || impactData.totalCO2SavedKg} duration={1500} suffix=" kg" />
             </div>
-            <div className="clean-impact-sub">Methane & CO₂ prevented</div>
+            <div className="clean-impact-sub">
+              Methane & CO₂ prevented
+              <span title="Based on ~2.5kg CO2e per kg of food waste diverted, EPA estimate" style={{ cursor: 'help', marginLeft: '5px', fontSize: '0.9em' }}>ℹ️</span>
+            </div>
           </div>
           <div className="clean-impact-cell">
             <div className="clean-impact-label">⏰ Today's Impact</div>

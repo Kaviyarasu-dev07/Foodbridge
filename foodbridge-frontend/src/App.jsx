@@ -10,6 +10,7 @@ import RegisterPage from './pages/RegisterPage';
 import DonorDashboard from './pages/DonorDashboard';
 import NGODashboard from './pages/NGODashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import VolunteerDashboard from './pages/VolunteerDashboard';
 import Leaderboard from './pages/Leaderboard';
 import ImpactCertificate from './pages/ImpactCertificate';
 
@@ -29,6 +30,7 @@ const ProtectedRoute = ({ children, allowedRole }) => {
     if (role === 'DONOR') return <Navigate to="/donor/dashboard" replace />;
     if (role === 'NGO') return <Navigate to="/ngo/dashboard" replace />;
     if (role === 'ADMIN') return <Navigate to="/admin/dashboard" replace />;
+    if (role === 'VOLUNTEER') return <Navigate to="/volunteer/dashboard" replace />;
     return <Navigate to="/" replace />;
   }
 
@@ -145,6 +147,14 @@ function App() {
           element={
             <ProtectedRoute allowedRole="ADMIN">
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/volunteer/dashboard"
+          element={
+            <ProtectedRoute allowedRole="VOLUNTEER">
+              <VolunteerDashboard />
             </ProtectedRoute>
           }
         />

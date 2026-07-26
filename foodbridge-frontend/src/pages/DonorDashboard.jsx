@@ -23,6 +23,12 @@ const DonorDashboard = () => {
   const [aiEstimated, setAiEstimated] = useState(false);
   const [activeChatListing, setActiveChatListing] = useState(null);
   const [unreadCounts, setUnreadCounts] = useState({});
+  const [averageRating, setAverageRating] = useState(null);
+  const [ratingListing, setRatingListing] = useState(null);
+  const [ratingScore, setRatingScore] = useState(5);
+  const [ratingComment, setRatingComment] = useState('');
+  const [docFile, setDocFile] = useState(null);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,6 +45,13 @@ const DonorDashboard = () => {
       setProfile(response.data);
       if (!location && response.data.city) {
         setLocation(`${response.data.city}`);
+      }
+      // Fetch average rating
+      try {
+        const ratingRes = await api.get(`/api/ratings/user/${response.data.id}/average`);
+        setAverageRating(ratingRes.data);
+      } catch (e) {
+        console.error("Failed to fetch average rating", e);
       }
     } catch (err) {
       console.error("Fetch profile error:", err);
@@ -60,6 +73,42 @@ const DonorDashboard = () => {
       setUnreadCounts(res.data.byListing || {});
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const handleUploadDoc = async () => {
+    if (!docFile) return;
+    setUploadingDoc(true);
+    try {
+      const formData = new FormData();
+      formData.append('document', docFile);
+      await api.post('/api/donor/verify/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      toast.success("Document uploaded for verification!");
+      setDocFile(null);
+      fetchProfile(); // Refresh profile to show PENDING status
+    } catch (err) {
+      toast.error(err.response?.data?.error || "Upload failed");
+    } finally {
+      setUploadingDoc(false);
+    }
+  };
+
+  const handleRatingSubmit = async () => {
+    if (ratingScore < 1 || ratingScore > 5) return;
+    try {
+      await api.post('/api/ratings', {
+        listingId: ratingListing.id,
+        score: ratingScore,
+        comment: ratingComment
+      });
+      toast.success('Rating submitted successfully!');
+      setRatingListing(null);
+      setRatingScore(5);
+      setRatingComment('');
+    } catch (err) {
+      toast.error(err.response?.data || 'Failed to submit rating');
     }
   };
 
@@ -119,7 +168,21 @@ const DonorDashboard = () => {
       <header className="dashboard-header">
         <div className="header-brand">
           <h2>FoodBridge Donor Portal</h2>
-          <p>{t('auth.welcome', 'Welcome back')}, <strong>{profile?.name}</strong></p>
+          <p>
+            {t('auth.welcome', 'Welcome back')}, <strong>{profile?.name}</strong>
+            {averageRating !== null && averageRating > 0 && <span className="badge" style={{marginLeft: '10px', background: '#fef3c7', color: '#b45309', padding: '4px 8px', borderRadius: '12px', fontSize: '0.8rem'}}>⭐ {averageRating.toFixed(1)}</span>}
+            {profile?.verificationStatus === 'VERIFIED' && <span className="badge" style={{marginLeft: '10px', background: '#dcfce7', color: '#166534', padding: '4px 8px', borderRadius: '12px', fontSize: '0.8rem'}}>✅ Verified</span>}
+            {profile?.verificationStatus === 'PENDING' && <span className="badge" style={{marginLeft: '10px', background: '#fef9c3', color: '#854d0e', padding: '4px 8px', borderRadius: '12px', fontSize: '0.8rem'}}>⏳ Pending Verification</span>}
+            {profile?.verificationStatus === 'REJECTED' && <span className="badge" style={{marginLeft: '10px', background: '#fee2e2', color: '#991b1b', padding: '4px 8px', borderRadius: '12px', fontSize: '0.8rem'}}>❌ Rejected</span>}
+          </p>
+          
+          {profile && profile.verificationStatus !== 'VERIFIED' && profile.verificationStatus !== 'PENDING' && (
+            <div className="verification-upload" style={{marginTop: '10px', fontSize: '0.9rem', display: 'flex', gap: '10px', alignItems: 'center', background: 'var(--card-bg)', padding: '10px', borderRadius: '8px', border: '1px solid var(--gray-light)'}}>
+              <span style={{color: 'var(--text-color)'}}>{profile.verificationStatus === 'REJECTED' ? 'Re-upload document:' : 'Get verified (FSSAI/ID):'}</span>
+              <input type="file" accept="image/jpeg, image/png, application/pdf" onChange={e => setDocFile(e.target.files[0])} style={{fontSize: '0.8rem', maxWidth: '200px'}} />
+              {docFile && <button className="btn btn-primary btn-small" onClick={handleUploadDoc} disabled={uploadingDoc}>{uploadingDoc ? 'Uploading...' : 'Upload'}</button>}
+            </div>
+          )}
         </div>
         <div className="header-actions">
           <ThemeToggle />
@@ -287,15 +350,24 @@ const DonorDashboard = () => {
                         </td>
                         <td>
                           {item.status === 'CLAIMED' ? (
-                            <button
-                              onClick={() => setActiveChatListing(item)}
-                              className="btn btn-primary btn-small chat-btn"
-                            >
-                              💬 Chat
-                              {unreadCounts[item.id] > 0 && (
-                                <span className="unread-badge">{unreadCounts[item.id]}</span>
-                              )}
-                            </button>
+                            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                              <button
+                                onClick={() => setActiveChatListing(item)}
+                                className="btn btn-primary btn-small chat-btn"
+                              >
+                                💬 Chat
+                                {unreadCounts[item.id] > 0 && (
+                                  <span className="unread-badge">{unreadCounts[item.id]}</span>
+                                )}
+                              </button>
+                              <button 
+                                onClick={() => setRatingListing(item)}
+                                className="btn btn-secondary btn-small"
+                                style={{ background: '#fef3c7', color: '#b45309', borderColor: '#fef3c7' }}
+                              >
+                                ⭐ Rate this pickup
+                              </button>
+                            </div>
                           ) : (
                             <span className="no-qr" style={{ color: 'var(--gray-dark)', fontSize: '0.85rem' }}>Available after claim</span>
                           )}
@@ -309,6 +381,43 @@ const DonorDashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Rating Modal */}
+      {ratingListing && (
+        <div className="modal-overlay" onClick={() => setRatingListing(null)}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()}>
+            <h3>Rate the NGO Pickup</h3>
+            <p>How was your experience for <strong>{ratingListing.foodName}</strong>?</p>
+            
+            <div className="form-group" style={{ marginTop: '20px' }}>
+              <label>Score (1-5)</label>
+              <select value={ratingScore} onChange={(e) => setRatingScore(parseInt(e.target.value))}>
+                <option value={5}>⭐⭐⭐⭐⭐ (5 - Excellent)</option>
+                <option value={4}>⭐⭐⭐⭐ (4 - Good)</option>
+                <option value={3}>⭐⭐⭐ (3 - Average)</option>
+                <option value={2}>⭐⭐ (2 - Poor)</option>
+                <option value={1}>⭐ (1 - Terrible)</option>
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label>Comment (Optional)</label>
+              <textarea 
+                value={ratingComment} 
+                onChange={(e) => setRatingComment(e.target.value)}
+                placeholder="Share your experience..."
+                rows="3"
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--gray-light)' }}
+              />
+            </div>
+            
+            <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+              <button onClick={handleRatingSubmit} className="btn btn-primary" style={{ flex: '1' }}>Submit Rating</button>
+              <button onClick={() => setRatingListing(null)} className="btn btn-secondary" style={{ flex: '1' }}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* QR Code Modal */}
       {viewingQR && (

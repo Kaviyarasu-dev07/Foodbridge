@@ -71,6 +71,7 @@ public class AuthController {
                 .status(user.getStatus())
                 .trustScore(user.getTrustScore())
                 .createdAt(user.getCreatedAt())
+                .verificationStatus(user.getVerificationStatus())
                 .build();
 
         return ResponseEntity.ok(profile);

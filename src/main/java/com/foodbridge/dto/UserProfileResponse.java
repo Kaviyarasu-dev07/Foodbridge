@@ -2,6 +2,7 @@ package com.foodbridge.dto;
 
 import com.foodbridge.entity.User.Role;
 import com.foodbridge.entity.User.UserStatus;
+import com.foodbridge.entity.VerificationStatus;
 import java.time.LocalDateTime;
 
 public class UserProfileResponse {
@@ -16,12 +17,14 @@ public class UserProfileResponse {
     private UserStatus status;
     private Double trustScore;
     private LocalDateTime createdAt;
+    private VerificationStatus verificationStatus;
 
     public UserProfileResponse() {
     }
 
     public UserProfileResponse(Long id, String name, String email, Role role, String phone, String city,
-                              Double latitude, Double longitude, UserStatus status, Double trustScore, LocalDateTime createdAt) {
+                              Double latitude, Double longitude, UserStatus status, Double trustScore, LocalDateTime createdAt,
+                              VerificationStatus verificationStatus) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -33,6 +36,7 @@ public class UserProfileResponse {
         this.status = status;
         this.trustScore = trustScore;
         this.createdAt = createdAt;
+        this.verificationStatus = verificationStatus;
     }
 
     public Long getId() { return id; }
@@ -57,6 +61,8 @@ public class UserProfileResponse {
     public void setTrustScore(Double trustScore) { this.trustScore = trustScore; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public VerificationStatus getVerificationStatus() { return verificationStatus; }
+    public void setVerificationStatus(VerificationStatus verificationStatus) { this.verificationStatus = verificationStatus; }
 
     public static UserProfileResponseBuilder builder() {
         return new UserProfileResponseBuilder();
@@ -74,6 +80,7 @@ public class UserProfileResponse {
         private UserStatus status;
         private Double trustScore;
         private LocalDateTime createdAt;
+        private VerificationStatus verificationStatus;
 
         UserProfileResponseBuilder() {}
 
@@ -88,9 +95,10 @@ public class UserProfileResponse {
         public UserProfileResponseBuilder status(UserStatus status) { this.status = status; return this; }
         public UserProfileResponseBuilder trustScore(Double trustScore) { this.trustScore = trustScore; return this; }
         public UserProfileResponseBuilder createdAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
+        public UserProfileResponseBuilder verificationStatus(VerificationStatus verificationStatus) { this.verificationStatus = verificationStatus; return this; }
 
         public UserProfileResponse build() {
-            return new UserProfileResponse(id, name, email, role, phone, city, latitude, longitude, status, trustScore, createdAt);
+            return new UserProfileResponse(id, name, email, role, phone, city, latitude, longitude, status, trustScore, createdAt, verificationStatus);
         }
     }
 }

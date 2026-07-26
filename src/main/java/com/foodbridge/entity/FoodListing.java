@@ -47,6 +47,15 @@ public class FoodListing {
     @Column(columnDefinition = "TEXT")
     private String qrCode;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "volunteer_id")
+    @com.fasterxml.jackson.annotation.JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    private User volunteer;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "delivery_status")
+    private DeliveryStatus deliveryStatus = DeliveryStatus.PENDING;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -56,7 +65,7 @@ public class FoodListing {
 
     public FoodListing(Long id, User donor, String foodName, String quantity, FoodType foodType, FoodCondition condition,
                        String location, Double latitude, Double longitude, Integer pickupMinutes, LocalDateTime expiresAt,
-                       ListingStatus status, String qrCode, LocalDateTime createdAt) {
+                       ListingStatus status, String qrCode, LocalDateTime createdAt, User volunteer, DeliveryStatus deliveryStatus) {
         this.id = id;
         this.donor = donor;
         this.foodName = foodName;
@@ -71,6 +80,8 @@ public class FoodListing {
         this.status = status;
         this.qrCode = qrCode;
         this.createdAt = createdAt;
+        this.volunteer = volunteer;
+        this.deliveryStatus = deliveryStatus != null ? deliveryStatus : DeliveryStatus.PENDING;
     }
 
     public Long getId() { return id; }
@@ -101,6 +112,10 @@ public class FoodListing {
     public void setQrCode(String qrCode) { this.qrCode = qrCode; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public User getVolunteer() { return volunteer; }
+    public void setVolunteer(User volunteer) { this.volunteer = volunteer; }
+    public DeliveryStatus getDeliveryStatus() { return deliveryStatus; }
+    public void setDeliveryStatus(DeliveryStatus deliveryStatus) { this.deliveryStatus = deliveryStatus; }
 
     public static FoodListingBuilder builder() {
         return new FoodListingBuilder();
@@ -121,6 +136,8 @@ public class FoodListing {
         private ListingStatus status;
         private String qrCode;
         private LocalDateTime createdAt;
+        private User volunteer;
+        private DeliveryStatus deliveryStatus = DeliveryStatus.PENDING;
 
         FoodListingBuilder() {}
 
@@ -138,9 +155,11 @@ public class FoodListing {
         public FoodListingBuilder status(ListingStatus status) { this.status = status; return this; }
         public FoodListingBuilder qrCode(String qrCode) { this.qrCode = qrCode; return this; }
         public FoodListingBuilder createdAt(LocalDateTime createdAt) { this.createdAt = createdAt; return this; }
+        public FoodListingBuilder volunteer(User volunteer) { this.volunteer = volunteer; return this; }
+        public FoodListingBuilder deliveryStatus(DeliveryStatus deliveryStatus) { this.deliveryStatus = deliveryStatus; return this; }
 
         public FoodListing build() {
-            return new FoodListing(id, donor, foodName, quantity, foodType, condition, location, latitude, longitude, pickupMinutes, expiresAt, status, qrCode, createdAt);
+            return new FoodListing(id, donor, foodName, quantity, foodType, condition, location, latitude, longitude, pickupMinutes, expiresAt, status, qrCode, createdAt, volunteer, deliveryStatus);
         }
     }
 

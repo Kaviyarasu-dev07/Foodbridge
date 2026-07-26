@@ -8,7 +8,6 @@ const PhotoEstimator = ({ onConfirm, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [estimate, setEstimate] = useState(null);
   const [dragActive, setDragActive] = useState(false);
-  const [cropOption, setCropOption] = useState('1:1'); // Mock aspect ratio crop options
   
   const fileInputRef = useRef(null);
 
@@ -139,40 +138,11 @@ const PhotoEstimator = ({ onConfirm, onClose }) => {
           </div>
         )}
 
-        {/* Image Preview with Aspect Ratio Mock Crop Boundary */}
+        {/* Image Preview */}
         {imagePreview && !estimate && !loading && (
           <div className="preview-container">
-            <div className="aspect-ratio-selector">
-              <span>Select crop aspect ratio:</span>
-              <button 
-                className={`ratio-btn ${cropOption === '1:1' ? 'active' : ''}`}
-                onClick={() => setCropOption('1:1')}
-              >
-                1:1 (Square)
-              </button>
-              <button 
-                className={`ratio-btn ${cropOption === '4:3' ? 'active' : ''}`}
-                onClick={() => setCropOption('4:3')}
-              >
-                4:3 (Standard)
-              </button>
-              <button 
-                className={`ratio-btn ${cropOption === '16:9' ? 'active' : ''}`}
-                onClick={() => setCropOption('16:9')}
-              >
-                16:9 (Wide)
-              </button>
-            </div>
-            
             <div className="preview-wrapper">
               <img src={imagePreview} alt="Food Upload Preview" />
-              {/* Mock crop box frame overlay */}
-              <div className={`crop-frame crop-ratio-${cropOption.replace(':', '-')}`}>
-                <div className="crop-corner top-left"></div>
-                <div className="crop-corner top-right"></div>
-                <div className="crop-corner bottom-left"></div>
-                <div className="crop-corner bottom-right"></div>
-              </div>
             </div>
 
             <div className="action-row">
