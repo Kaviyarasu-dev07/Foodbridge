@@ -13,6 +13,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Value;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 
 @RestController
 @RequestMapping("/api")
@@ -20,6 +25,15 @@ public class VerificationController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Value("${cloudinary.cloud_name}")
+    private String cloudName;
+
+    @Value("${cloudinary.api_key}")
+    private String apiKey;
+
+    @Value("${cloudinary.api_secret}")
+    private String apiSecret;
 
     // Authenticated upload for dashboard
     @PostMapping("/donor/verify/upload")
@@ -62,15 +76,15 @@ public class VerificationController {
         }
 
         try {
-            String filename = System.currentTimeMillis() + "_" + document.getOriginalFilename().replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
-            Path uploadPath = Paths.get("uploads");
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
+            Cloudinary cloudinary = new Cloudinary(ObjectUtils.asMap(
+                    "cloud_name", cloudName,
+                    "api_key", apiKey,
+                    "api_secret", apiSecret));
 
-            Files.copy(document.getInputStream(), uploadPath.resolve(filename));
+            Map uploadResult = cloudinary.uploader().upload(document.getBytes(), ObjectUtils.emptyMap());
+            String secureUrl = (String) uploadResult.get("secure_url");
 
-            user.setVerificationDocumentUrl("/uploads/" + filename);
+            user.setVerificationDocumentUrl(secureUrl);
             user.setVerificationStatus(VerificationStatus.PENDING);
             userRepository.save(user);
 
