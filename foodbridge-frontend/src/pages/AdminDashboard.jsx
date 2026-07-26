@@ -292,9 +292,10 @@ const AdminDashboard = () => {
             </div>
           )}
         </div>
+      </div>
 
-        {/* Platform Analytics Section */}
-        <div className="dashboard-card form-card" style={{ marginTop: '30px' }}>
+      {/* Platform Analytics Section */}
+      <div className="dashboard-card form-card" style={{ marginTop: '30px' }}>
           <div className="panel-header">
             <h3>Platform Analytics</h3>
             <button onClick={fetchAnalytics} className="btn btn-secondary btn-small">Reload</button>
@@ -353,8 +354,6 @@ const AdminDashboard = () => {
               </div>
             </div>
           )}
-        </div>
-
       </div>
     </div>
   );

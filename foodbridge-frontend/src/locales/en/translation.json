@@ -34,6 +34,10 @@
       "title": "Live food near you",
       "noFood": "No food listings near you right now",
       "recentPickups": "Recent pickups"
+    },
+    "admin": {
+      "title": "Admin Dashboard",
+      "subtitle": "Manage users, NGOs, and listings"
     }
   },
   "badges": {

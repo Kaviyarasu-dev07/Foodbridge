@@ -2,9 +2,40 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
 import api from '../services/api';
 import ThemeToggle from '../components/ThemeToggle';
 import RouteMap from '../components/RouteMap';
+
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIcon,
+  iconRetinaUrl: markerIcon2x,
+  shadowUrl: markerShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  tooltipAnchor: [16, -28],
+  shadowSize: [41, 41]
+});
+
+const MapBounds = ({ stops }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (stops && stops.length > 0) {
+      const bounds = L.latLngBounds(stops.map(stop => [stop.latitude, stop.longitude]));
+      map.fitBounds(bounds, { padding: [50, 50] });
+    }
+  }, [stops, map]);
+  return null;
+};
 
 const VolunteerDashboard = () => {
   const { t } = useTranslation();
@@ -17,6 +48,7 @@ const VolunteerDashboard = () => {
   
   const [routeData, setRouteData] = useState(null);
   const [optimizing, setOptimizing] = useState(false);
+  const [showRouteMap, setShowRouteMap] = useState(false);
 
   useEffect(() => {
     fetchProfile();
@@ -88,6 +120,7 @@ const VolunteerDashboard = () => {
       };
       const response = await api.post('/api/volunteer/route/optimize', payload);
       setRouteData(response.data);
+      setShowRouteMap(true);
       toast.success('Route optimized!');
     } catch (err) {
       console.error("Optimization failed:", err);
@@ -179,6 +212,11 @@ const VolunteerDashboard = () => {
                     <button onClick={() => handleOptimizeRoute()} className="btn btn-secondary btn-block" disabled={optimizing}>
                       {optimizing ? 'Calculating...' : 'Re-Optimize Route 🗺️'}
                     </button>
+                    {routeData && (
+                      <button onClick={() => setShowRouteMap(true)} className="btn btn-primary btn-block">
+                        View Route Map 🗺️
+                      </button>
+                    )}
                   </div>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
@@ -210,27 +248,57 @@ const VolunteerDashboard = () => {
                 <h3>Optimized Route</h3>
                 <div style={{ display: 'flex', gap: '15px' }}>
                   <span className="badge" style={{ background: 'var(--primary)', color: 'white' }}>{routeData.totalDistanceKm} km</span>
-                  <span className="badge" style={{ background: '#0284c7', color: 'white' }}>~{routeData.totalEstimatedMinutes} mins</span>
+                  <span className="badge" style={{ background: '#0284c7', color: 'white' }}>~{routeData.estimatedTotalMinutes} mins</span>
                 </div>
               </div>
               
-              <div style={{ flex: 1, minHeight: '400px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--gray-light)' }}>
-                <RouteMap routeData={routeData} />
-              </div>
+              {showRouteMap && (
+                <div style={{ flex: 1, minHeight: '400px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--gray-light)' }}>
+                  <RouteMap route={routeData} onClose={() => setShowRouteMap(false)} />
+                </div>
+              )}
 
               <div style={{ marginTop: '20px' }}>
                 <h4>Stops Overview</h4>
                 <ul className="route-stops-list">
                   {routeData.stops.map(stop => (
                     <li key={stop.stopOrder} className="route-stop-item">
-                      <div className="stop-marker">{stop.stopOrder}</div>
-                      <div className="stop-details">
-                        <strong>{stop.foodName}</strong>
-                        <span>{stop.location} • {stop.distanceFromPreviousKm} km</span>
+                      <div className="stop-number-box">{stop.stopOrder}</div>
+                      <div className="stop-details-col">
+                        <h4>{stop.foodName}</h4>
+                        <p>{stop.location} • {stop.distanceFromPrevious} km</p>
                       </div>
                     </li>
                   ))}
                 </ul>
+
+                <div style={{ marginTop: '20px', height: '350px', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--gray-light)' }}>
+                  <MapContainer center={[13.0827, 80.2707]} zoom={12} style={{ height: '100%', width: '100%' }}>
+                    <TileLayer
+                      attribution='&copy; OpenStreetMap'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    {routeData.stops && routeData.stops.length > 0 && (
+                      <>
+                        <MapBounds stops={routeData.stops} />
+                        <Polyline 
+                          positions={routeData.stops.map(stop => [stop.latitude, stop.longitude])} 
+                          color="var(--primary)" 
+                          weight={4} 
+                          opacity={0.7} 
+                        />
+                        {routeData.stops.map(stop => (
+                          <Marker key={stop.stopOrder} position={[stop.latitude, stop.longitude]}>
+                            <Popup>
+                              <strong>{stop.stopOrder}. {stop.foodName}</strong><br/>
+                              {stop.location}
+                            </Popup>
+                          </Marker>
+                        ))}
+                      </>
+                    )}
+                  </MapContainer>
+                </div>
 
                 <a 
                   href={routeData.googleMapsUrl} 
